@@ -9,7 +9,7 @@ class VMTranslator:
         self.parser = Parser(Path(input_file_path).stem)
         self.assembly_file_content = []
         self.file_content = self._read_file(input_file_path)
-        self.output_file_path = os.path.splitext(input_file_path)[0] + '.hack'
+        self.output_file_path = os.path.splitext(input_file_path)[0] + '.asm'
 
     def translate(self):
         self._clean_file()
@@ -34,6 +34,6 @@ class VMTranslator:
 
     def _write_to_file(self):
         with open(self.output_file_path, 'w') as output_file:
-            output_file.write('\n'.join(self.binary_file_content))
+            output_file.write('\n'.join(self.assembly_file_content))
 
         output_file.close()

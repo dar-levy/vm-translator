@@ -1,4 +1,3 @@
-import sys
 from vm_translator import VMTranslator
 
 

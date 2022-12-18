@@ -11,8 +11,6 @@ class Parser:
     def parse(self, expression, index):
         subexpressions = expression.split()
         command = subexpressions[0]
-        segment = subexpressions[1]
-        value = subexpressions[2]
         if command in self.logics:
             return self.code_generator.logics[command]
         elif command in self.arithmetics:
@@ -20,6 +18,6 @@ class Parser:
         elif command in self.comparisons:
             return self.code_generator.comparisons[command]
         elif command == "push":
-            return self.code_generator.push[segment](value)
+            return self.code_generator.push[subexpressions[1]](subexpressions[2])
         elif command == "pop":
-            return self.code_generator.pop[segment](value)
+            return self.code_generator.pop[subexpressions[1]](subexpressions[2])
