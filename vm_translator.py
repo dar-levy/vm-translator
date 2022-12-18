@@ -1,11 +1,12 @@
 import os
+from pathlib import Path
 
 from parser import Parser
 
 
 class VMTranslator:
     def __init__(self, input_file_path):
-        self.parser = Parser()
+        self.parser = Parser(Path(input_file_path).stem)
         self.assembly_file_content = []
         self.file_content = self._read_file(input_file_path)
         self.output_file_path = os.path.splitext(input_file_path)[0] + '.hack'

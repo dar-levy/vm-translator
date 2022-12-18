@@ -1,5 +1,6 @@
 class CodeGenerator:
     def __init__(self, root):
+        self.nextLabel = 0
         self.arithmetics = {
             "add": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=D+M", "@SP", "M=M+1"],
             "sub": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=D-M", "@SP", "M=M+1"],
@@ -210,7 +211,9 @@ class CodeGenerator:
     def get_logic_gate(self, command):
         return self.arithmetics[command]
 
-    def get_comparison_gate(self, command, label):
+    def get_comparison_gate(self, command):
+        label = str(self.nextLabel)
+        self.nextLabel += 1
         return self.comparisons[command](label)
 
     def get_push_segment(self, segment, index):
