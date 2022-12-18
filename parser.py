@@ -1,46 +1,23 @@
+from code_generator import CodeGenerator
+
+
 class Parser:
-    def __init__(self, source):
-        self.infile = open(source)
-        self.command = ["nada"]
-        self.advanceReachedEOF = False
+    def __init__(self, root):
+        self.code_generator = CodeGenerator(root)
+        self.arithmetics = list(self.code_generator.arithmetics.keys())
+        self.comparisons = list(self.code_generator.comparisons.keys())
+        self.logics = list(self.code_generator.logics.keys())
 
-        self.cType = {
-            "sub": "math",
-            "add": "math",
-            "neg": "math",
-            "eq": "math",
-            "gt": "math",
-            "lt": "math",
-            "and": "math",
-            "or": "math",
-            "not": "math",
-            "push": "push",
-            "pop": "pop",
-            "EOF": "EOF",
-        }
-
-    def hasMoreCommands(self):
-        position = self.infile.tell()
-        self.advance()
-        self.infile.seek(position)
-        return not self.advanceReachedEOF
-
-    def advance(self):
-        thisLine = self.infile.readline()
-        if thisLine == '':
-            self.advanceReachedEOF = True
-        else:
-            splitLine = thisLine.split("/")[0].strip()
-            if splitLine == '':
-                self.advance()
-            else:
-                self.command = splitLine.split()
-
-    def commandType(self):
-        return self.cType.get(self.command[0], "invalid cType")
-
-    def arg1(self):
-        return self.command[1]
-
-    def arg2(self):
-        return self.command[2]
+    def parse(self, expression):
+        subexpressions = expression.split()
+        command = subexpressions[0]
+        if command in self.logics:
+            return self.code_generator.get_logic_gate(command)
+        elif command in self.arithmetics:
+            return self.code_generator.get_arithmetic_gate(command)
+        elif command in self.comparisons:
+            return self.code_generator.get_comparison_gate(command)
+        elif command == "push":
+            return self.code_generator.get_push_segment(subexpressions[1], subexpressions[2])
+        elif command == "pop":
+            return self.code_generator.get_pop_segment(subexpressions[1], subexpressions[2])
