@@ -3,85 +3,209 @@ class CodeGenerator:
         self.root = dest[:-4].split('/')[-1]
         self.outfile = open(dest, "w")
         self.nextLabel = 0
-
-    def setFileName(self, source):
-        self.fileName = source[:-3]
+        self.arithmetics = {
+            "add": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=D+M", "@SP", "M=M+1"],
+            "sub": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=D-M", "@SP", "M=M+1"],
+            "neg": ["@SP", "A=M-1", "M=-M"],
+            "not": ["@SP", "A=M-1", "M=!M"],
+            "or": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "M=D|M"],
+            "and": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "M=D&M"],
+            "eq": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D\n", "M=-1\n", "@eqTrue" + label + "\n", "D;JEQ\n",
+                   "@SP\n", "A=M-1\n", "M=0\n", "(eqTrue" + label + ")\n"],
+            "gt": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D\n", "M=-1\n", "@gtTrue" + label + "\n", "D;JGT\n",
+                   "@SP\n", "A=M-1\n", "M=0\n", "(gtTrue" + label + ")\n"],
+            "lt": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D\n", "M=-1\n", "@ltTrue" + label + "\n", "D;JLT\n",
+                   "@SP\n", "A=M-1\n", "M=0\n", "(ltTrue" + label + ")\n"]
+        }
+        self.push = {
+            "constant": [
+                "@" + index,
+                "D=A",
+                "@SP",
+                "A=M",
+                "M=D",
+                "@SP",
+                "M=M+1",
+            ],
+            "static": [
+                "@" + self.root + "." + index,
+                "D=M",
+                "@SP",
+                "A=M",
+                "M=D",
+                "@SP",
+                "M=M+1"
+            ],
+            "this": [
+                "@" + index,
+                "D=A",
+                "@THIS",
+                "A=M+D",
+                "D=M",
+                "@SP",
+                "A=M",
+                "M=D",
+                "@SP",
+                "M=M+1"
+            ],
+            "that": [
+                "@" + index,
+                "D=A",
+                "@THAT",
+                "A=M+D",
+                "D=M",
+                "@SP",
+                "A=M",
+                "M=D",
+                "@SP",
+                "M=M+1"
+            ],
+            "argument": [
+                "@" + index,
+                "D=A",
+                "@ARG",
+                "A=M+D",
+                "D=M",
+                "@SP",
+                "A=M",
+                "M=D",
+                "@SP",
+                "M=M+1"
+            ],
+            "local": [
+                "@" + index,
+                "D=A",
+                "@LCL",
+                "A=M+D",
+                "D=M",
+                "@SP",
+                "A=M",
+                "M=D",
+                "@SP",
+                "M=M+1"
+            ],
+            "temp": [
+                "@" + index,
+                "D=A",
+                "@5",
+                "A=A+D",
+                "D=M",
+                "@SP",
+                "A=M",
+                "M=D",
+                "@SP",
+                "M=M+1"
+            ],
+            "pointer": [
+                "@" + index,
+                "D=A",
+                "@3",
+                "A=A+D",
+                "D=M",
+                "@SP",
+                "A=M",
+                "M=D",
+                "@SP",
+                "M=M+1"
+            ]
+        }
+        self.pop = {
+            "static": [
+                "@SP",
+                "AM=M-1",
+                "D=M",
+                "@" + self.root + "." + index,
+                "M=D"
+            ],
+            "this": [
+                "@" + index,
+                "D=A",
+                "@THIS",
+                "D=M+D",
+                "@R13",
+                "M=D",
+                "@SP",
+                "AM=M-1",
+                "D=M",
+                "@R13",
+                "A=M",
+                "M=D"
+            ],
+            "that": [
+                "@" + index,
+                "D=A",
+                "@THAT",
+                "D=M+D",
+                "@R13",
+                "M=D",
+                "@SP",
+                "AM=M-1",
+                "D=M",
+                "@R13",
+                "A=M",
+                "M=D"
+            ],
+            "argument": [
+                "@" + index,
+                "D=A",
+                "@ARG",
+                "D=M+D",
+                "@R13",
+                "M=D",
+                "@SP",
+                "AM=M-1",
+                "D=M",
+                "@R13",
+                "A=M",
+                "M=D"
+            ],
+            "local": [
+                "@" + index,
+                "D=A",
+                "@LCL",
+                "D=M+D",
+                "@R13",
+                "M=D",
+                "@SP",
+                "AM=M-1",
+                "D=M",
+                "@R13",
+                "A=M",
+                "M=D"
+            ],
+            "pointer": [
+                "@" + index,
+                "D=A",
+                "@3",
+                "D=A+D",
+                "@R13",
+                "M=D",
+                "@SP",
+                "AM=M-1",
+                "D=M",
+                "@R13",
+                "A=M",
+                "M=D"
+            ],
+            "temp": [
+                "@" + index,
+                "D=A",
+                "@5",
+                "D=A+D",
+                "@R13",
+                "M=D",
+                "@SP",
+                "AM=M-1",
+                "D=M",
+                "@R13",
+                "A=M",
+                "M=D"
+            ]
+        }
 
     def writeArithmetic(self, command):
         trans = ""
-        if command == "add":
-            trans += "@SP\n"  # pop first value into D
-            trans += "AM=M-1\n"
-            trans += "D=M\n"
-            trans += "@SP\n"  # pop second value into M
-            trans += "AM=M-1\n"
-            trans += "M=D+M\n"  # push sum onto M
-            trans += "@SP\n"
-            trans += "M=M+1\n"
-        elif command == "sub":
-            trans += "@SP\n"  # pop first value into D
-            trans += "AM=M-1\n"
-            trans += "D=M\n"
-            trans += "@SP\n"  # pop second value into M
-            trans += "AM=M-1\n"
-            trans += "M=M-D\n"  # push difference onto M
-            trans += "@SP\n"
-            trans += "M=M+1\n"
-        elif command == "neg":
-            trans += "@SP\n"  # get (not pop) value into M
-            trans += "A=M-1\n"
-            trans += "M=-M\n"  # and negate it
-        elif command == "not":
-            trans += "@SP\n"  # get (not pop) value into M
-            trans += "A=M-1\n"
-            trans += "M=!M\n"  # and negate it
-        elif command == "or":
-            trans += "@SP\n"  # pop first value into D
-            trans += "AM=M-1\n"
-            trans += "D=M\n"
-            trans += "@SP\n"  # get second value into M
-            trans += "A=M-1\n"
-            trans += "M=D|M\n"  # put result back on stack
-        elif command == "and":
-            trans += "@SP\n"  # pop first value into D
-            trans += "AM=M-1\n"
-            trans += "D=M\n"
-            trans += "@SP\n"  # get second value into M
-            trans += "A=M-1\n"
-            trans += "M=D&M\n"  # put result back on stack
-        elif command == "eq":
-            label = str(self.nextLabel)
-            self.nextLabel += 1
-            trans += "@SP\n"  # pop first value into D
-            trans += "AM=M-1\n"
-            trans += "D=M\n"
-            trans += "@SP\n"  # get second value into M
-            trans += "A=M-1\n"
-            trans += "D=M-D\n"  # D = older value - newer
-            trans += "M=-1\n"  # tentatively put true on stack
-            trans += "@eqTrue" + label + "\n"  # and jump to end if so
-            trans += "D;JEQ\n"
-            trans += "@SP\n"  # set to false otherwise
-            trans += "A=M-1\n"
-            trans += "M=0\n"
-            trans += "(eqTrue" + label + ")\n"
-        elif command == "gt":
-            label = str(self.nextLabel)
-            self.nextLabel += 1
-            trans += "@SP\n"  # pop first value into D
-            trans += "AM=M-1\n"
-            trans += "D=M\n"
-            trans += "@SP\n"  # get second value into M
-            trans += "A=M-1\n"
-            trans += "D=M-D\n"  # D = older value - newer
-            trans += "M=-1\n"  # tentatively put true on stack
-            trans += "@gtTrue" + label + "\n"  # and jump to end if so
-            trans += "D;JGT\n"
-            trans += "@SP\n"  # set to false otherwise
-            trans += "A=M-1\n"
-            trans += "M=0\n"
-            trans += "(gtTrue" + label + ")\n"
-        elif command == "lt":
+        if command == "lt":
             label = str(self.nextLabel)
             self.nextLabel += 1
             trans += "@SP\n"  # pop first value into D
@@ -97,184 +221,6 @@ class CodeGenerator:
             trans += "A=M-1\n"
             trans += "M=0\n"
             trans += "(ltTrue" + label + ")\n"
-
-    def writePushPop(self, command, segment, index):
-        trans = ""
-        if command == "push":
-            trans += "// push " + segment + index + "\n"
-            if segment == "constant":
-                trans += "@" + index + "\n"  # load index into A
-                trans += "D=A\n"  # move it to D
-                trans += "@SP\n"  # load 0 into A (M[0] contains stack pointer)
-                trans += "A=M\n"  # load stack pointer
-                trans += "M=D\n"  # put D onto stack
-                trans += "@SP\n"  # load stack pointer address into A
-                trans += "M=M+1\n"  # increment stack pointer
-            elif segment == "static":
-                trans += "@" + self.root + "." + index + "\n"
-                trans += "D=M\n"
-                trans += "@SP\n"
-                trans += "A=M\n"
-                trans += "M=D\n"
-                trans += "@SP\n"
-                trans += "M=M+1\n"
-            elif segment == "this":
-                trans += "@" + index + "\n"  # get value into D
-                trans += "D=A\n"
-                trans += "@THIS\n"
-                trans += "A=M+D\n"
-                trans += "D=M\n"
-                trans += "@SP\n"  # put it onto the stack
-                trans += "A=M\n"
-                trans += "M=D\n"
-                trans += "@SP\n"  # increment the stack pointer
-                trans += "M=M+1\n"
-            elif segment == "that":
-                trans += "@" + index + "\n"  # get value into D
-                trans += "D=A\n"
-                trans += "@THAT\n"
-                trans += "A=M+D\n"
-                trans += "D=M\n"
-                trans += "@SP\n"  # put it onto the stack
-                trans += "A=M\n"
-                trans += "M=D\n"
-                trans += "@SP\n"  # increment the stack pointer
-                trans += "M=M+1\n"
-            elif segment == "argument":
-                trans += "@" + index + "\n"  # get value into D
-                trans += "D=A\n"
-                trans += "@ARG\n"
-                trans += "A=M+D\n"
-                trans += "D=M\n"
-                trans += "@SP\n"  # put it onto the stack
-                trans += "A=M\n"
-                trans += "M=D\n"
-                trans += "@SP\n"  # increment the stack pointer
-                trans += "M=M+1\n"
-            elif segment == "local":
-                trans += "@" + index + "\n"  # get value into D
-                trans += "D=A\n"
-                trans += "@LCL\n"
-                trans += "A=M+D\n"
-                trans += "D=M\n"
-                trans += "@SP\n"  # put it onto the stack
-                trans += "A=M\n"
-                trans += "M=D\n"
-                trans += "@SP\n"  # increment the stack pointer
-                trans += "M=M+1\n"
-            elif segment == "temp":
-                trans += "@" + index + "\n"  # get value into D
-                trans += "D=A\n"
-                trans += "@5\n"
-                trans += "A=A+D\n"
-                trans += "D=M\n"
-                trans += "@SP\n"  # put it onto the stack
-                trans += "A=M\n"
-                trans += "M=D\n"
-                trans += "@SP\n"  # increment the stack pointer
-                trans += "M=M+1\n"
-            elif segment == "pointer":
-                trans += "@" + index + "\n"  # get value into D
-                trans += "D=A\n"
-                trans += "@3\n"
-                trans += "A=A+D\n"
-                trans += "D=M\n"
-                trans += "@SP\n"  # put it onto the stack
-                trans += "A=M\n"
-                trans += "M=D\n"
-                trans += "@SP\n"  # increment the stack pointer
-                trans += "M=M+1\n"
-            else:
-                trans += segment + " not implemented yet, can't push\n"
-        elif command == "pop":
-            trans += "// pop " + segment + index + "\n"
-            if segment == "static":
-                trans += "@SP\n"  # pop value into D
-                trans += "AM=M-1\n"
-                trans += "D=M\n"
-                trans += "@" + self.root + "." + index + "\n"
-                trans += "M=D\n"
-            elif segment == "this":
-                trans += "@" + index + "\n"  # get address into R13
-                trans += "D=A\n"
-                trans += "@THIS\n"
-                trans += "D=M+D\n"
-                trans += "@R13\n"
-                trans += "M=D\n"
-                trans += "@SP\n"  # pop value into D
-                trans += "AM=M-1\n"
-                trans += "D=M\n"
-                trans += "@R13\n"  # address back in A (no touchy D)
-                trans += "A=M\n"
-                trans += "M=D\n"
-            elif segment == "that":
-                trans += "@" + index + "\n"  # get address into R13
-                trans += "D=A\n"
-                trans += "@THAT\n"
-                trans += "D=M+D\n"
-                trans += "@R13\n"
-                trans += "M=D\n"
-                trans += "@SP\n"  # pop value into D
-                trans += "AM=M-1\n"
-                trans += "D=M\n"
-                trans += "@R13\n"  # address back in A (no touchy D)
-                trans += "A=M\n"
-                trans += "M=D\n"
-            elif segment == "argument":
-                trans += "@" + index + "\n"  # get address into R13
-                trans += "D=A\n"
-                trans += "@ARG\n"
-                trans += "D=M+D\n"
-                trans += "@R13\n"
-                trans += "M=D\n"
-                trans += "@SP\n"  # pop value into D
-                trans += "AM=M-1\n"
-                trans += "D=M\n"
-                trans += "@R13\n"  # address back in A (no touchy D)
-                trans += "A=M\n"
-                trans += "M=D\n"
-            elif segment == "local":
-                trans += "@" + index + "\n"  # get address into R13
-                trans += "D=A\n"
-                trans += "@LCL\n"
-                trans += "D=M+D\n"
-                trans += "@R13\n"
-                trans += "M=D\n"
-                trans += "@SP\n"  # pop value into D
-                trans += "AM=M-1\n"
-                trans += "D=M\n"
-                trans += "@R13\n"  # address back in A (no touchy D)
-                trans += "A=M\n"
-                trans += "M=D\n"
-            elif segment == "pointer":
-                trans += "@" + index + "\n"  # get address into R13
-                trans += "D=A\n"
-                trans += "@3\n"
-                trans += "D=A+D\n"
-                trans += "@R13\n"
-                trans += "M=D\n"
-                trans += "@SP\n"  # pop value into D
-                trans += "AM=M-1\n"
-                trans += "D=M\n"
-                trans += "@R13\n"  # address back in A (no touchy D)
-                trans += "A=M\n"
-                trans += "M=D\n"
-            elif segment == "temp":
-                trans += "@" + index + "\n"  # get address into R13
-                trans += "D=A\n"
-                trans += "@5\n"
-                trans += "D=A+D\n"
-                trans += "@R13\n"
-                trans += "M=D\n"
-                trans += "@SP\n"  # pop value into D
-                trans += "AM=M-1\n"
-                trans += "D=M\n"
-                trans += "@R13\n"  # address back in A (no touchy D)
-                trans += "A=M\n"
-                trans += "M=D\n"
-            else:
-                trans += segment + " not implemented yet, can't pop\n"
-        self.outfile.write(trans)
 
     def writeError(self):
         self.outfile.write("Whoopsie, command not recognized\n")
