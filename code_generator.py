@@ -10,12 +10,12 @@ class CodeGenerator:
             "not": ["@SP", "A=M-1", "M=!M"],
             "or": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "M=D|M"],
             "and": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "M=D&M"],
-            "eq": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D\n", "M=-1\n", "@eqTrue" + label + "\n", "D;JEQ\n",
-                   "@SP\n", "A=M-1\n", "M=0\n", "(eqTrue" + label + ")\n"],
-            "gt": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D\n", "M=-1\n", "@gtTrue" + label + "\n", "D;JGT\n",
-                   "@SP\n", "A=M-1\n", "M=0\n", "(gtTrue" + label + ")\n"],
-            "lt": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D\n", "M=-1\n", "@ltTrue" + label + "\n", "D;JLT\n",
-                   "@SP\n", "A=M-1\n", "M=0\n", "(ltTrue" + label + ")\n"]
+            "eq": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D", "M=-1", "@eqTrue" + label, "D;JEQ",
+                   "@SP", "A=M-1", "M=0", "(eqTrue" + label + ")"],
+            "gt": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D", "M=-1", "@gtTrue" + label, "D;JGT",
+                   "@SP", "A=M-1", "M=0", "(gtTrue" + label + ")"],
+            "lt": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D", "M=-1", "@ltTrue" + label, "D;JLT",
+                   "@SP", "A=M-1", "M=0", "(ltTrue" + label + ")"]
         }
         self.push = {
             "constant": [
