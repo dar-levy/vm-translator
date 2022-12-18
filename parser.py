@@ -8,16 +8,16 @@ class Parser:
         self.comparisons = list(self.code_generator.comparisons.keys())
         self.logics = list(self.code_generator.logics.keys())
 
-    def parse(self, expression, index):
+    def parse(self, expression):
         subexpressions = expression.split()
         command = subexpressions[0]
         if command in self.logics:
-            return self.code_generator.logics[command]
+            return self.code_generator.get_logic_gate(command)
         elif command in self.arithmetics:
-            return self.code_generator.arithmetics[command]
+            return self.code_generator.get_arithmetic_gate(command)
         elif command in self.comparisons:
-            return self.code_generator.comparisons[command]
+            return self.code_generator.get_comparison_gate(command)
         elif command == "push":
-            return self.code_generator.push[subexpressions[1]](subexpressions[2])
+            return self.code_generator.get_push_segment(subexpressions[1], subexpressions[2])
         elif command == "pop":
-            return self.code_generator.pop[subexpressions[1]](subexpressions[2])
+            return self.code_generator.get_pop_segment(subexpressions[1], subexpressions[2])
