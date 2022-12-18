@@ -1,24 +1,26 @@
 class CodeGenerator:
-    def __init__(self, dest):
-        self.root = dest[:-4].split('/')[-1]
-        self.outfile = open(dest, "w")
-        self.nextLabel = 0
+    def __init__(self, root):
+        self.root = root
         self.arithmetics = {
             "add": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=D+M", "@SP", "M=M+1"],
             "sub": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=D-M", "@SP", "M=M+1"],
             "neg": ["@SP", "A=M-1", "M=-M"],
+        }
+        self.comparisons = {
+            "eq": (lambda label: ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D", "M=-1", "@eqTrue" + label, "D;JEQ",
+                                  "@SP", "A=M-1", "M=0", "(eqTrue" + label + ")"]),
+            "gt": (lambda label: ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D", "M=-1", "@gtTrue" + label, "D;JGT",
+                                  "@SP", "A=M-1", "M=0", "(gtTrue" + label + ")"]),
+            "lt": (lambda label: ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D", "M=-1", "@ltTrue" + label, "D;JLT",
+                                  "@SP", "A=M-1", "M=0", "(ltTrue" + label + ")"])
+        }
+        self.logics = {
             "not": ["@SP", "A=M-1", "M=!M"],
             "or": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "M=D|M"],
-            "and": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "M=D&M"],
-            "eq": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D", "M=-1", "@eqTrue" + label, "D;JEQ",
-                   "@SP", "A=M-1", "M=0", "(eqTrue" + label + ")"],
-            "gt": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D", "M=-1", "@gtTrue" + label, "D;JGT",
-                   "@SP", "A=M-1", "M=0", "(gtTrue" + label + ")"],
-            "lt": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D", "M=-1", "@ltTrue" + label, "D;JLT",
-                   "@SP", "A=M-1", "M=0", "(ltTrue" + label + ")"]
+            "and": ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "M=D&M"]
         }
         self.push = {
-            "constant": [
+            "constant": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@SP",
@@ -26,8 +28,8 @@ class CodeGenerator:
                 "M=D",
                 "@SP",
                 "M=M+1",
-            ],
-            "static": [
+            ]),
+            "static": (lambda index: [
                 "@" + self.root + "." + index,
                 "D=M",
                 "@SP",
@@ -35,8 +37,8 @@ class CodeGenerator:
                 "M=D",
                 "@SP",
                 "M=M+1"
-            ],
-            "this": [
+            ]),
+            "this": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@THIS",
@@ -47,8 +49,8 @@ class CodeGenerator:
                 "M=D",
                 "@SP",
                 "M=M+1"
-            ],
-            "that": [
+            ]),
+            "that": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@THAT",
@@ -59,8 +61,8 @@ class CodeGenerator:
                 "M=D",
                 "@SP",
                 "M=M+1"
-            ],
-            "argument": [
+            ]),
+            "argument": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@ARG",
@@ -71,8 +73,8 @@ class CodeGenerator:
                 "M=D",
                 "@SP",
                 "M=M+1"
-            ],
-            "local": [
+            ]),
+            "local": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@LCL",
@@ -83,8 +85,8 @@ class CodeGenerator:
                 "M=D",
                 "@SP",
                 "M=M+1"
-            ],
-            "temp": [
+            ]),
+            "temp": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@5",
@@ -95,8 +97,8 @@ class CodeGenerator:
                 "M=D",
                 "@SP",
                 "M=M+1"
-            ],
-            "pointer": [
+            ]),
+            "pointer": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@3",
@@ -107,17 +109,17 @@ class CodeGenerator:
                 "M=D",
                 "@SP",
                 "M=M+1"
-            ]
+            ])
         }
         self.pop = {
-            "static": [
+            "static": (lambda index: [
                 "@SP",
                 "AM=M-1",
                 "D=M",
                 "@" + self.root + "." + index,
                 "M=D"
-            ],
-            "this": [
+            ]),
+            "this": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@THIS",
@@ -130,8 +132,8 @@ class CodeGenerator:
                 "@R13",
                 "A=M",
                 "M=D"
-            ],
-            "that": [
+            ]),
+            "that": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@THAT",
@@ -144,8 +146,8 @@ class CodeGenerator:
                 "@R13",
                 "A=M",
                 "M=D"
-            ],
-            "argument": [
+            ]),
+            "argument": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@ARG",
@@ -158,8 +160,8 @@ class CodeGenerator:
                 "@R13",
                 "A=M",
                 "M=D"
-            ],
-            "local": [
+            ]),
+            "local": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@LCL",
@@ -172,8 +174,8 @@ class CodeGenerator:
                 "@R13",
                 "A=M",
                 "M=D"
-            ],
-            "pointer": [
+            ]),
+            "pointer": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@3",
@@ -186,8 +188,8 @@ class CodeGenerator:
                 "@R13",
                 "A=M",
                 "M=D"
-            ],
-            "temp": [
+            ]),
+            "temp": (lambda index: [
                 "@" + index,
                 "D=A",
                 "@5",
@@ -200,10 +202,10 @@ class CodeGenerator:
                 "@R13",
                 "A=M",
                 "M=D"
-            ]
+            ])
         }
 
-    def writeArithmetic(self, command):
+    def write_arithmetic(self, command):
         trans = ""
         if command == "lt":
             label = str(self.nextLabel)
@@ -222,5 +224,8 @@ class CodeGenerator:
             trans += "M=0\n"
             trans += "(ltTrue" + label + ")\n"
 
-    def writeError(self):
-        self.outfile.write("Whoopsie, command not recognized\n")
+    def get_push_segment(self, segment, index):
+        return self.push[segment](index)
+
+    def get_pop_segment(self, segment, index):
+        return self.pop[segment](index)
