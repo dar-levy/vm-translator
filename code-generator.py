@@ -278,3 +278,6 @@ class CodeWriter:
             else:
                 trans += segment + " not implemented yet, can't pop\n"
         self.outfile.write(trans)
+
+    def writeError(self):
+        self.outfile.write("Whoopsie, command not recognized\n")
