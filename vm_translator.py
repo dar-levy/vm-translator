@@ -33,6 +33,6 @@ class VMTranslator:
 
     def _write_to_file(self):
         with open(self.output_file_path, 'w') as output_file:
-            output_file.write(''.join(self.binary_file_content))
+            output_file.write('\n'.join(self.binary_file_content))
 
         output_file.close()

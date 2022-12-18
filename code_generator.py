@@ -97,9 +97,6 @@ class CodeGenerator:
             trans += "A=M-1\n"
             trans += "M=0\n"
             trans += "(ltTrue" + label + ")\n"
-        else:
-            trans = command + " not implemented yet\n"
-        self.outfile.write("// " + command + "\n" + trans)
 
     def writePushPop(self, command, segment, index):
         trans = ""
