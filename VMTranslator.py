@@ -3,7 +3,9 @@ from vm_translator import VMTranslator
 
 
 def main():
-    vm_translator = VMTranslator(sys.argv[1])
+    # root = sys.argv[1]
+    root = "/Users/darlevy/PycharmProjects/vm-translator/StaticTest.vm"
+    vm_translator = VMTranslator(root)
     vm_translator.translate()
 
 
