@@ -18,3 +18,9 @@ class Parser:
             "pop": "pop",
             "EOF": "EOF",
         }
+
+    def hasMoreCommands(self):
+        position = self.infile.tell()
+        self.advance()
+        self.infile.seek(position)
+        return not self.advanceReachedEOF
