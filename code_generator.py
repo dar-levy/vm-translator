@@ -1,6 +1,5 @@
 class CodeGenerator:
     def __init__(self, root):
-        self.root = root
         self.arithmetics = {
             "add": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=D+M", "@SP", "M=M+1"],
             "sub": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=D-M", "@SP", "M=M+1"],
@@ -30,7 +29,7 @@ class CodeGenerator:
                 "M=M+1",
             ]),
             "static": (lambda index: [
-                "@" + self.root + "." + index,
+                "@" + root + "." + index,
                 "D=M",
                 "@SP",
                 "A=M",
@@ -116,7 +115,7 @@ class CodeGenerator:
                 "@SP",
                 "AM=M-1",
                 "D=M",
-                "@" + self.root + "." + index,
+                "@" + root + "." + index,
                 "M=D"
             ]),
             "this": (lambda index: [
@@ -205,24 +204,14 @@ class CodeGenerator:
             ])
         }
 
-    def write_arithmetic(self, command):
-        trans = ""
-        if command == "lt":
-            label = str(self.nextLabel)
-            self.nextLabel += 1
-            trans += "@SP\n"  # pop first value into D
-            trans += "AM=M-1\n"
-            trans += "D=M\n"
-            trans += "@SP\n"  # get second value into M
-            trans += "A=M-1\n"
-            trans += "D=M-D\n"  # D = older value - newer
-            trans += "M=-1\n"  # tentatively put true on stack
-            trans += "@ltTrue" + label + "\n"  # and jump to end if so
-            trans += "D;JLT\n"
-            trans += "@SP\n"  # set to false otherwise
-            trans += "A=M-1\n"
-            trans += "M=0\n"
-            trans += "(ltTrue" + label + ")\n"
+    def get_arithmetic_gate(self, command):
+        return self.arithmetics[command]
+
+    def get_logic_gate(self, command):
+        return self.arithmetics[command]
+
+    def get_comparison_gate(self, command, label):
+        return self.comparisons[command](label)
 
     def get_push_segment(self, segment, index):
         return self.push[segment](index)
