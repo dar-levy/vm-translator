@@ -100,3 +100,181 @@ class CodeWriter:
         else:
             trans = command + " not implemented yet\n"
         self.outfile.write("// " + command + "\n" + trans)
+
+    def writePushPop(self, command, segment, index):
+        trans = ""
+        if command == "push":
+            trans += "// push " + segment + index + "\n"
+            if segment == "constant":
+                trans += "@" + index + "\n"  # load index into A
+                trans += "D=A\n"  # move it to D
+                trans += "@SP\n"  # load 0 into A (M[0] contains stack pointer)
+                trans += "A=M\n"  # load stack pointer
+                trans += "M=D\n"  # put D onto stack
+                trans += "@SP\n"  # load stack pointer address into A
+                trans += "M=M+1\n"  # increment stack pointer
+            elif segment == "static":
+                trans += "@" + self.root + "." + index + "\n"
+                trans += "D=M\n"
+                trans += "@SP\n"
+                trans += "A=M\n"
+                trans += "M=D\n"
+                trans += "@SP\n"
+                trans += "M=M+1\n"
+            elif segment == "this":
+                trans += "@" + index + "\n"  # get value into D
+                trans += "D=A\n"
+                trans += "@THIS\n"
+                trans += "A=M+D\n"
+                trans += "D=M\n"
+                trans += "@SP\n"  # put it onto the stack
+                trans += "A=M\n"
+                trans += "M=D\n"
+                trans += "@SP\n"  # increment the stack pointer
+                trans += "M=M+1\n"
+            elif segment == "that":
+                trans += "@" + index + "\n"  # get value into D
+                trans += "D=A\n"
+                trans += "@THAT\n"
+                trans += "A=M+D\n"
+                trans += "D=M\n"
+                trans += "@SP\n"  # put it onto the stack
+                trans += "A=M\n"
+                trans += "M=D\n"
+                trans += "@SP\n"  # increment the stack pointer
+                trans += "M=M+1\n"
+            elif segment == "argument":
+                trans += "@" + index + "\n"  # get value into D
+                trans += "D=A\n"
+                trans += "@ARG\n"
+                trans += "A=M+D\n"
+                trans += "D=M\n"
+                trans += "@SP\n"  # put it onto the stack
+                trans += "A=M\n"
+                trans += "M=D\n"
+                trans += "@SP\n"  # increment the stack pointer
+                trans += "M=M+1\n"
+            elif segment == "local":
+                trans += "@" + index + "\n"  # get value into D
+                trans += "D=A\n"
+                trans += "@LCL\n"
+                trans += "A=M+D\n"
+                trans += "D=M\n"
+                trans += "@SP\n"  # put it onto the stack
+                trans += "A=M\n"
+                trans += "M=D\n"
+                trans += "@SP\n"  # increment the stack pointer
+                trans += "M=M+1\n"
+            elif segment == "temp":
+                trans += "@" + index + "\n"  # get value into D
+                trans += "D=A\n"
+                trans += "@5\n"
+                trans += "A=A+D\n"
+                trans += "D=M\n"
+                trans += "@SP\n"  # put it onto the stack
+                trans += "A=M\n"
+                trans += "M=D\n"
+                trans += "@SP\n"  # increment the stack pointer
+                trans += "M=M+1\n"
+            elif segment == "pointer":
+                trans += "@" + index + "\n"  # get value into D
+                trans += "D=A\n"
+                trans += "@3\n"
+                trans += "A=A+D\n"
+                trans += "D=M\n"
+                trans += "@SP\n"  # put it onto the stack
+                trans += "A=M\n"
+                trans += "M=D\n"
+                trans += "@SP\n"  # increment the stack pointer
+                trans += "M=M+1\n"
+            else:
+                trans += segment + " not implemented yet, can't push\n"
+        elif command == "pop":
+            trans += "// pop " + segment + index + "\n"
+            if segment == "static":
+                trans += "@SP\n"  # pop value into D
+                trans += "AM=M-1\n"
+                trans += "D=M\n"
+                trans += "@" + self.root + "." + index + "\n"
+                trans += "M=D\n"
+            elif segment == "this":
+                trans += "@" + index + "\n"  # get address into R13
+                trans += "D=A\n"
+                trans += "@THIS\n"
+                trans += "D=M+D\n"
+                trans += "@R13\n"
+                trans += "M=D\n"
+                trans += "@SP\n"  # pop value into D
+                trans += "AM=M-1\n"
+                trans += "D=M\n"
+                trans += "@R13\n"  # address back in A (no touchy D)
+                trans += "A=M\n"
+                trans += "M=D\n"
+            elif segment == "that":
+                trans += "@" + index + "\n"  # get address into R13
+                trans += "D=A\n"
+                trans += "@THAT\n"
+                trans += "D=M+D\n"
+                trans += "@R13\n"
+                trans += "M=D\n"
+                trans += "@SP\n"  # pop value into D
+                trans += "AM=M-1\n"
+                trans += "D=M\n"
+                trans += "@R13\n"  # address back in A (no touchy D)
+                trans += "A=M\n"
+                trans += "M=D\n"
+            elif segment == "argument":
+                trans += "@" + index + "\n"  # get address into R13
+                trans += "D=A\n"
+                trans += "@ARG\n"
+                trans += "D=M+D\n"
+                trans += "@R13\n"
+                trans += "M=D\n"
+                trans += "@SP\n"  # pop value into D
+                trans += "AM=M-1\n"
+                trans += "D=M\n"
+                trans += "@R13\n"  # address back in A (no touchy D)
+                trans += "A=M\n"
+                trans += "M=D\n"
+            elif segment == "local":
+                trans += "@" + index + "\n"  # get address into R13
+                trans += "D=A\n"
+                trans += "@LCL\n"
+                trans += "D=M+D\n"
+                trans += "@R13\n"
+                trans += "M=D\n"
+                trans += "@SP\n"  # pop value into D
+                trans += "AM=M-1\n"
+                trans += "D=M\n"
+                trans += "@R13\n"  # address back in A (no touchy D)
+                trans += "A=M\n"
+                trans += "M=D\n"
+            elif segment == "pointer":
+                trans += "@" + index + "\n"  # get address into R13
+                trans += "D=A\n"
+                trans += "@3\n"
+                trans += "D=A+D\n"
+                trans += "@R13\n"
+                trans += "M=D\n"
+                trans += "@SP\n"  # pop value into D
+                trans += "AM=M-1\n"
+                trans += "D=M\n"
+                trans += "@R13\n"  # address back in A (no touchy D)
+                trans += "A=M\n"
+                trans += "M=D\n"
+            elif segment == "temp":
+                trans += "@" + index + "\n"  # get address into R13
+                trans += "D=A\n"
+                trans += "@5\n"
+                trans += "D=A+D\n"
+                trans += "@R13\n"
+                trans += "M=D\n"
+                trans += "@SP\n"  # pop value into D
+                trans += "AM=M-1\n"
+                trans += "D=M\n"
+                trans += "@R13\n"  # address back in A (no touchy D)
+                trans += "A=M\n"
+                trans += "M=D\n"
+            else:
+                trans += segment + " not implemented yet, can't pop\n"
+        self.outfile.write(trans)
