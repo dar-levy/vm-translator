@@ -1,9 +1,12 @@
 import sys
 from parser import Parser
 from code_generator import CodeGenerator
+from vm_translator import VMTranslator
 
 
 def main():
+    vm_translator = VMTranslator(sys.argv[1])
+    vm_translator.translate()
     root = sys.argv[1]
     parser = Parser(root + ".vm")
     writer = CodeGenerator(root + ".asm")
