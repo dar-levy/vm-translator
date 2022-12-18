@@ -209,7 +209,7 @@ class CodeGenerator:
         return self.arithmetics[command]
 
     def get_logic_gate(self, command):
-        return self.arithmetics[command]
+        return self.logics[command]
 
     def get_comparison_gate(self, command):
         label = str(self.nextLabel)
