@@ -35,3 +35,12 @@ class Parser:
                 self.advance()
             else:
                 self.command = splitLine.split()
+
+    def commandType(self):
+        return self.cType.get(self.command[0], "invalid cType")
+
+    def arg1(self):
+        return self.command[1]
+
+    def arg2(self):
+        return self.command[2]
