@@ -2,8 +2,8 @@ class CodeGenerator:
     def __init__(self, root):
         self.nextLabel = 0
         self.arithmetics = {
-            "add": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=D+M", "@SP", "M=M+1"],
-            "sub": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=D-M", "@SP", "M=M+1"],
+            "add": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=M+D", "@SP", "M=M+1"],
+            "sub": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=M-D", "@SP", "M=M+1"],
             "neg": ["@SP", "A=M-1", "M=-M"],
         }
         self.comparisons = {
