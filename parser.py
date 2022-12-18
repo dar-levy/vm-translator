@@ -13,13 +13,13 @@ class Parser:
     def parse(self, expression, index):
         subexpressions = expression.split(' ')
         command = subexpressions[0]
-        if command in self.arithmetics:
-            return self.arithmetics[command]
+        if command in self.logics:
+            return self.code_generator.logics[command]
+        elif command in self.arithmetics:
+            return self.code_generator.arithmetics[command]
         elif command in self.comparisons:
-            return self.comparisons[command](index)
-        elif command in self.logics:
-            return self.logics[command]
+            return self.code_generator.comparisons[command](index)
         elif command in self.push:
-            return self.push[command](index)
+            return self.code_generator.push[command](index)
         elif command in self.pop:
-            return self.pop[command](index)
+            return self.code_generator.pop[command](index)
