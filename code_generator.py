@@ -176,17 +176,11 @@ class CodeGenerator:
                 "M=D"
             ]),
             "pointer": (lambda index: [
-                "@" + index,
-                "D=A",
-                "@3",
-                "D=A+D",
-                "@R13",
-                "M=D",
                 "@SP",
-                "AM=M-1",
-                "D=M",
-                "@R13",
+                "M=M-1",
                 "A=M",
+                "D=M",
+                "@THAT",
                 "M=D"
             ]),
             "temp": (lambda index: [
@@ -204,6 +198,26 @@ class CodeGenerator:
                 "M=D"
             ])
         }
+        self.branching = {
+            "label": (lambda expression: [
+                "(" + expression + ")",
+            ]),
+            "goto": (lambda expression: [
+                "@" + expression,
+                "0;JMP"
+            ]),
+            "if-goto": (lambda expression: [
+                "@SP",
+                "M=M-1",
+                "A=M",
+                "D=M",
+                "@" + expression,
+                "D;JNE"
+            ]),
+        }
+
+    def get_branching_command(self, command, expression):
+        return self.branching[command](expression)
 
     def get_arithmetic_gate(self, command):
         return self.arithmetics[command]

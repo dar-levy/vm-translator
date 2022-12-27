@@ -23,7 +23,9 @@ class VMTranslator:
     def _convert_to_assembly(self):
         for line in self.file_content:
             assembly_translation = self.parser.parse(line)
+            self.assembly_file_content.extend(["// " + line])
             self.assembly_file_content.extend(assembly_translation)
+            self.assembly_file_content.extend([""])
 
     def _read_file(self, file_path):
         with open(file_path, "r") as input_file:
