@@ -204,6 +204,19 @@ class CodeGenerator:
                 "M=D"
             ])
         }
+        self.branching = {
+            "label": (lambda expression: [
+                "(" + expression + ")",
+            ]),
+            "if-goto": (lambda expression: [
+                "@SP",
+                "M=M-1",
+                "A=M",
+                "D=M",
+                "@" + expression,
+                "D;JNE"
+            ]),
+        }
 
     def get_arithmetic_gate(self, command):
         return self.arithmetics[command]
