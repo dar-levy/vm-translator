@@ -176,17 +176,11 @@ class CodeGenerator:
                 "M=D"
             ]),
             "pointer": (lambda index: [
-                "@" + index,
-                "D=A",
-                "@3",
-                "D=A+D",
-                "@R13",
-                "M=D",
                 "@SP",
-                "AM=M-1",
-                "D=M",
-                "@R13",
+                "M=M-1",
                 "A=M",
+                "D=M",
+                "@THAT",
                 "M=D"
             ]),
             "temp": (lambda index: [
