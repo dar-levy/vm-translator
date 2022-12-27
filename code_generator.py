@@ -208,6 +208,10 @@ class CodeGenerator:
             "label": (lambda expression: [
                 "(" + expression + ")",
             ]),
+            "goto": (lambda expression: [
+                "@" + expression,
+                "0;JMP"
+            ]),
             "if-goto": (lambda expression: [
                 "@SP",
                 "M=M-1",
@@ -217,6 +221,9 @@ class CodeGenerator:
                 "D;JNE"
             ]),
         }
+
+    def get_branching_command(self, command, expression):
+        return self.branching[command](expression)
 
     def get_arithmetic_gate(self, command):
         return self.arithmetics[command]
