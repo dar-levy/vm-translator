@@ -22,8 +22,9 @@ class VMTranslator:
         self._bootstrap_assembly_content()
 
     def _bootstrap_assembly_content(self):
+        vm_file_count = len([file for file in os.listdir(self.input_path) if file.endswith(".vm")])
         init_function_name = ''.join([line.split()[1] for line in self.content if ".init" in line])
-        if init_function_name:
+        if vm_file_count > 1:
             bootstrap_prefix = ["// bootstrap"] + self.parser.parse("bootstrap") + [""]
             bootstrap_suffix = [f"// call {init_function_name}"] + self.parser.parse(f"call {init_function_name} 0",
                                                                                      "bootstrap") + [""]
