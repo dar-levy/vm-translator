@@ -12,8 +12,31 @@ class CodeGenerator:
                                   "@SP", "A=M-1", "M=0", "(eqTrue" + label + ")"]),
             "gt": (lambda label: ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D", "M=-1", "@gtTrue" + label, "D;JGT",
                                   "@SP", "A=M-1", "M=0", "(gtTrue" + label + ")"]),
-            "lt": (lambda label: ["@SP", "AM=M-1", "D=M", "@SP", "A=M-1", "D=M-D", "M=-1", "@ltTrue" + label, "D;JLT",
-                                  "@SP", "A=M-1", "M=0", "(ltTrue" + label + ")"])
+            "lt": (lambda label: ["@SP",
+                                  "A=M",
+                                  "A=A-1",
+                                  "A=A-1",
+                                  "D=M",
+                                  "A=A+1",
+                                  "D=D-M",
+                                  "@SP",
+                                  "M=M-1",
+                                  "M=M-1",
+                                  f"({label})",
+                                  "D;JLT",
+                                  "@SP",
+                                  "A=M",
+                                  "M=0",
+                                  f"(END{label})",
+                                  "0;JMP",
+                                  f"(TRUE{label})",
+                                  "@SP",
+                                  "A=M",
+                                  "M=-1",
+                                  f"(END{label})",
+                                  "@SP",
+                                  "M=M+1"
+                                  ])
         }
         self.logics = {
             "not": ["@SP", "A=M-1", "M=!M"],
