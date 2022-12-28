@@ -219,16 +219,13 @@ class CodeGenerator:
         self.functions = {
             "function": (lambda function_name, line_number: [
                 f"({function_name[1]})",
+            ]),
+            "function_extension": (lambda function_name, line_number: [
                 "@SP",
                 "A=M",
                 "M=0",
                 "@SP",
                 "M=M+1",
-                "@SP",
-                "A=M",
-                "M=0",
-                "@SP",
-                "M=M+1"
             ]),
             "return": (lambda function_name, line_number: [
                 "@LCL",
@@ -344,8 +341,13 @@ class CodeGenerator:
     def get_bootstrap(self):
         return self.bootstrap
 
-    def get_functions_handle(self, handle, function_name, line_number):
-        return self.functions[handle](function_name, line_number)
+    def get_functions_handle(self, handle, subexpressions, line_number):
+        assembly_function = self.functions[handle](subexpressions, line_number)
+        if len(subexpressions) == 3:
+            for i in range(int(subexpressions[2])):
+                assembly_function = assembly_function + self.functions["function_extension"]("extension", 1)
+
+        return assembly_function
 
     def get_branching_command(self, command, expression):
         return self.branching[command](expression)
