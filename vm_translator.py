@@ -8,7 +8,7 @@ class VMTranslator:
         self.content = []
         self.assembly_content = []
         self.input_path = path.dirname(directory_path) if path.isfile(directory_path) else directory_path
-        self.output_file_path = f"{self.input_path}/{os.path.basename(os.path.normpath(directory_path))}.asm"
+        self.output_file_path = f"{self.input_path}/{os.path.basename(os.path.normpath(self.input_path))}.asm"
         self.parser = Parser()
 
     def translate(self):
