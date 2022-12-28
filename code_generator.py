@@ -1,10 +1,37 @@
 class CodeGenerator:
     def __init__(self, root):
+        self.current_function = ""
         self.nextLabel = 0
         self.bootstrap = ["@256", "D=A", "@SP", "M=D"]
         self.arithmetics = {
-            "add": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=M+D", "@SP", "M=M+1"],
-            "sub": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=M-D", "@SP", "M=M+1"],
+            "add": ["@SP",
+                    "A=M",
+                    "A=A-1",
+                    "A=A-1",
+                    "D=M",
+                    "A=A+1",
+                    "D=D+M",
+                    "@SP",
+                    "M=M-1",
+                    "M=M-1",
+                    "A=M",
+                    "M=D",
+                    "@SP",
+                    "M=M+1"],
+            "sub": ["@SP",
+                    "A=M",
+                    "A=A-1",
+                    "A=A-1",
+                    "D=M",
+                    "A=A+1",
+                    "D=D-M",
+                    "@SP",
+                    "M=M-1",
+                    "M=M-1",
+                    "A=M",
+                    "M=D",
+                    "@SP",
+                    "M=M+1"],
             "neg": ["@SP", "A=M-1", "M=-M"],
         }
         self.comparisons = {
