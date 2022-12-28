@@ -81,7 +81,7 @@ class CodeGenerator:
                 "M=M+1",
             ]),
             "static": (lambda index: [
-                f"@{self.current_function}.{index}",
+                f"@{self.current_function.split('.')[0]}.{index}",
                 "D=M",
                 "@SP",
                 "A=M",
@@ -169,7 +169,7 @@ class CodeGenerator:
                 "@SP",
                 "AM=M-1",
                 "D=M",
-                f"@{self.current_function}.{index}",
+                f"@{self.current_function.split('.')[0]}.{index}",
                 "M=D"
             ]),
             "this": (lambda index: [
