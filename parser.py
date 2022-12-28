@@ -10,10 +10,12 @@ class Parser:
         self.branching = list(self.code_generator.branching.keys())
         self.logics = list(self.code_generator.logics.keys())
 
-    def parse(self, expression, line_number):
+    def parse(self, expression, line_number=-1):
         subexpressions = expression.split()
         command = subexpressions[0]
-        if command in self.logics:
+        if command == "bootstrap":
+            return self.code_generator.get_bootstrap()
+        elif command in self.logics:
             return self.code_generator.get_logic_gate(command)
         elif command in self.arithmetics:
             return self.code_generator.get_arithmetic_gate(command)

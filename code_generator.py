@@ -1,6 +1,7 @@
 class CodeGenerator:
     def __init__(self, root):
         self.nextLabel = 0
+        self.bootstrap = ["256", "D=A", "@SP", "M=D"]
         self.arithmetics = {
             "add": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=M+D", "@SP", "M=M+1"],
             "sub": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=M-D", "@SP", "M=M+1"],
@@ -339,6 +340,9 @@ class CodeGenerator:
                 f"(RETURN{line_number})"
             ])
         }
+
+    def get_bootstrap(self):
+        return self.bootstrap
 
     def get_functions_handle(self, handle, function_name, line_number):
         return self.functions[handle](function_name, line_number)
