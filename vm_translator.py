@@ -34,7 +34,7 @@ class VMTranslator:
 
     def _convert_to_assembly(self):
         for line_number, line in enumerate(self.content):
-            assembly_translation = self.parser.parse(line, line_number)
+            assembly_translation = self.parser.parse(line, line_number + 1)
             self.assembly_content.extend(["// " + line])
             self.assembly_content.extend(assembly_translation)
             self.assembly_content.extend([""])
