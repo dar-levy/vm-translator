@@ -21,7 +21,7 @@ class VMTranslator:
         self._bootstrap_assembly_content()
 
     def _bootstrap_assembly_content(self):
-        init_function_name = [line.split()[1] for line in self.content if ".init" in line]
+        init_function_name = ''.join([line.split()[1] for line in self.content if ".init" in line])
         if init_function_name:
             bootstrap_prefix = ["// bootstrap"] + self.parser.parse("bootstrap") + [""]
             bootstrap_suffix = [f"// call {init_function_name}"] + self.parser.parse(f"call {init_function_name}",
