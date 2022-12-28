@@ -253,10 +253,10 @@ class CodeGenerator:
         }
         self.branching = {
             "label": (lambda expression: [
-                "(" + expression + ")",
+                f"({self.current_function}${expression})",
             ]),
             "goto": (lambda expression: [
-                "@" + expression,
+                f"@{self.current_function}${expression}",
                 "0;JMP"
             ]),
             "if-goto": (lambda expression: [
@@ -264,7 +264,7 @@ class CodeGenerator:
                 "M=M-1",
                 "A=M",
                 "D=M",
-                "@" + expression,
+                f"@{self.current_function}${expression}",
                 "D;JNE"
             ]),
         }
@@ -395,7 +395,8 @@ class CodeGenerator:
 
     def get_functions_handle(self, handle, subexpressions, line_number):
         assembly_function = self.functions[handle](subexpressions, line_number)
-        if len(subexpressions) == 3 and handle == "function":
+        if handle == "function":
+            self.current_function = subexpressions[1]
             for i in range(int(subexpressions[2])):
                 assembly_function = assembly_function + self.functions["function_extension"]("extension", 1)
 
