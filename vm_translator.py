@@ -22,11 +22,11 @@ class VMTranslator:
 
     def _bootstrap_assembly_content(self):
         init_function_name = [line.split()[1] for line in self.content if ".init" in line]
-        if not init_function_name:
-            bootstrap_prefix = self.parser.parse("bootstrap")
-            bootstrap_suffix = self.parser.parse(f"call {init_function_name}", "bootstrap")
-            self.assembly_content.extend(bootstrap_prefix)
-            self.assembly_content.extend(bootstrap_suffix)
+        if init_function_name:
+            bootstrap_prefix = ["// bootstrap"] + self.parser.parse("bootstrap") + [""]
+            bootstrap_suffix = [f"// call {init_function_name}"] + self.parser.parse(f"call {init_function_name}",
+                                                                                     "bootstrap") + [""]
+            self.assembly_content = bootstrap_prefix + bootstrap_suffix
 
     def _clean_content(self):
         self.content = [line.split('/')[0].strip() for line in self.content if

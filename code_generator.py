@@ -1,7 +1,7 @@
 class CodeGenerator:
     def __init__(self, root):
         self.nextLabel = 0
-        self.bootstrap = ["256", "D=A", "@SP", "M=D"]
+        self.bootstrap = ["@256", "D=A", "@SP", "M=D"]
         self.arithmetics = {
             "add": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=M+D", "@SP", "M=M+1"],
             "sub": ["@SP", "AM=M-1", "D=M", "@SP", "AM=M-1", "M=M-D", "@SP", "M=M+1"],
@@ -218,7 +218,7 @@ class CodeGenerator:
         }
         self.functions = {
             "function": (lambda function_name, line_number: [
-                f"({function_name})",
+                f"({function_name[1]})",
                 "@SP",
                 "A=M",
                 "M=0",
@@ -335,7 +335,7 @@ class CodeGenerator:
                 "D=M",
                 "@LCL",
                 "M=D",
-                f"@{function_name}",
+                f"@{function_name[1]}",
                 "0;JMP",
                 f"(RETURN{line_number})"
             ])
