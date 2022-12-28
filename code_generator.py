@@ -345,7 +345,7 @@ class CodeGenerator:
 
     def get_functions_handle(self, handle, subexpressions, line_number):
         assembly_function = self.functions[handle](subexpressions, line_number)
-        if len(subexpressions) == 3:
+        if len(subexpressions) == 3 and handle == "function":
             for i in range(int(subexpressions[2])):
                 assembly_function = assembly_function + self.functions["function_extension"]("extension", 1)
 
