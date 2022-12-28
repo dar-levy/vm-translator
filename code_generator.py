@@ -374,7 +374,7 @@ class CodeGenerator:
                 "@SP",
                 "M=M+1",
                 "D=M",
-                "@0",
+                f"@{function_name[2]}",
                 "D=D-A",
                 "@5",
                 "D=D-A",
