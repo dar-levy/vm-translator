@@ -1,5 +1,5 @@
 class CodeGenerator:
-    def __init__(self, root):
+    def __init__(self):
         self.current_function = ""
         self.nextLabel = 0
         self.bootstrap = ["@256", "D=A", "@SP", "M=D"]
@@ -81,7 +81,7 @@ class CodeGenerator:
                 "M=M+1",
             ]),
             "static": (lambda index: [
-                "@" + root + "." + index,
+                f"@{self.current_function}.{index}",
                 "D=M",
                 "@SP",
                 "A=M",
@@ -169,7 +169,7 @@ class CodeGenerator:
                 "@SP",
                 "AM=M-1",
                 "D=M",
-                "@" + root + "." + index,
+                f"@{self.current_function}.{index}",
                 "M=D"
             ]),
             "this": (lambda index: [

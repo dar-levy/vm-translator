@@ -2,8 +2,8 @@ from code_generator import CodeGenerator
 
 
 class Parser:
-    def __init__(self, root):
-        self.code_generator = CodeGenerator(root)
+    def __init__(self):
+        self.code_generator = CodeGenerator()
         self.arithmetics = list(self.code_generator.arithmetics.keys())
         self.comparisons = list(self.code_generator.comparisons.keys())
         self.functions = list(self.code_generator.functions.keys())
