@@ -217,7 +217,7 @@ class CodeGenerator:
         }
         self.functions = {
             "function": (lambda expression: [
-                f"({expression})",
+                f"({expression[1]})",
                 "@SP",
                 "A=M",
                 "M=0",
@@ -288,6 +288,9 @@ class CodeGenerator:
                 "0;JMP"
             ])
         }
+
+    def get_functions_handle(self, handle, function_name):
+        return self.functions[handle](function_name)
 
     def get_branching_command(self, command, expression):
         return self.branching[command](expression)
