@@ -1,4 +1,5 @@
 import os
+from os import path
 from parser import Parser
 
 
@@ -6,8 +7,8 @@ class VMTranslator:
     def __init__(self, directory_path):
         self.content = []
         self.assembly_content = []
-        self.input_path = directory_path
-        self.output_file_path = f"{directory_path}/{os.path.basename(os.path.normpath(directory_path))}.asm"
+        self.input_path = path.dirname(directory_path) if path.isfile(directory_path) else directory_path
+        self.output_file_path = f"{self.input_path}/{os.path.basename(os.path.normpath(directory_path))}.asm"
         self.parser = Parser()
 
     def translate(self):
