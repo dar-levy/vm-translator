@@ -216,8 +216,8 @@ class CodeGenerator:
             ]),
         }
         self.functions = {
-            "function": (lambda expression: [
-                f"({expression[1]})",
+            "function": (lambda function_name, line_number: [
+                f"({function_name})",
                 "@SP",
                 "A=M",
                 "M=0",
@@ -229,7 +229,7 @@ class CodeGenerator:
                 "@SP",
                 "M=M+1"
             ]),
-            "return": (lambda expression: [
+            "return": (lambda function_name, line_number: [
                 "@LCL",
                 "D=M",
                 "@frame",
@@ -287,8 +287,8 @@ class CodeGenerator:
                 "A=M",
                 "0;JMP"
             ]),
-            "call": (lambda expression: [
-                "@RETURNbootstrap",
+            "call": (lambda function_name, line_number: [
+                f"@RETURN{line_number}",
                 "D=A",
                 "@SP",
                 "A=M",
@@ -334,14 +334,14 @@ class CodeGenerator:
                 "D=M",
                 "@LCL",
                 "M=D",
-                "@Sys.init",
+                f"@{function_name}",
                 "0;JMP",
-                "(RETURNbootstrap)"
+                f"(RETURN{line_number})"
             ])
         }
 
-    def get_functions_handle(self, handle, function_name):
-        return self.functions[handle](function_name)
+    def get_functions_handle(self, handle, function_name, line_number):
+        return self.functions[handle](function_name, line_number)
 
     def get_branching_command(self, command, expression):
         return self.branching[command](expression)

@@ -10,7 +10,7 @@ class Parser:
         self.branching = list(self.code_generator.branching.keys())
         self.logics = list(self.code_generator.logics.keys())
 
-    def parse(self, expression):
+    def parse(self, expression, line_number):
         subexpressions = expression.split()
         command = subexpressions[0]
         if command in self.logics:
@@ -22,7 +22,7 @@ class Parser:
         elif command in self.branching:
             return self.code_generator.get_branching_command(command, subexpressions[1])
         elif command in self.functions:
-            return self.code_generator.get_functions_handle(command, subexpressions)
+            return self.code_generator.get_functions_handle(command, subexpressions[1], line_number)
         elif command == "push":
             return self.code_generator.get_push_segment(subexpressions[1], subexpressions[2])
         elif command == "pop":

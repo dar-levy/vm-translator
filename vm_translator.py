@@ -21,8 +21,8 @@ class VMTranslator:
                              line.strip() != '' and line.split('/')[0].strip() != '']
 
     def _convert_to_assembly(self):
-        for line in self.file_content:
-            assembly_translation = self.parser.parse(line)
+        for line_number, line in enumerate(self.file_content):
+            assembly_translation = self.parser.parse(line, line_number)
             self.assembly_file_content.extend(["// " + line])
             self.assembly_file_content.extend(assembly_translation)
             self.assembly_file_content.extend([""])
