@@ -40,7 +40,7 @@ class VMTranslator:
             self.assembly_content.extend([""])
 
     def _read_directory(self):
-        for file in os.listdir(self.input_path):
+        for file in sorted(os.listdir(self.input_path)):
             if file.endswith(".vm"):
                 content = self._read_file(os.path.join(self.input_path, file))
                 self.content.extend(content)
